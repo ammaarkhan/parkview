@@ -77,7 +77,7 @@ def get_user_choice():
     return user_choice
 
 def main():
-    ip_camera_url = 'http://142.231.31.68:8080/shot.jpg'
+    ip_camera_url = 'http://172.16.36.232:8080/shot.jpg'
     parking_spaces = load_parking_spaces()
 
     # Extract all parking space IDs

@@ -3,30 +3,33 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ParkingLotMap from './ParkingLotMap/ParkingLotMap';
 import TimeChart from './TimeChart.js';
 import database from '@react-native-firebase/database';
-import parkingSpacesData from './ParkingLotMap/ParkingSpaces.json';
+// import parkingSpacesData from './ParkingLotMap/ParkingSpaces.json';
+import parkingVid from './ParkingLotMap/ParkingSpaces.json';
+import parkingLive from './ParkingLotMap/ParkingSpacesLive.json';
 
 const DetailsScreen = ({ navigation, route }) => {
     const { lot: item } = route.params;
     const [occupiedSpaces, setOccupiedSpaces] = useState(new Map());
+    const parkingSpacesData = item.name === 'Gym Short term' ? parkingLive : parkingVid;
 
     useEffect(() => {
-        const reference = database().ref('/occupied_spaces');
+        // Determine the path based on the parking lot name
+        const dbPath = item.name === 'Gym Short term' ? '/occupied_live' : '/occupied_spaces';
+        const reference = database().ref(dbPath);
 
-        // Listen for changes in the /occupied_spaces path
         const onDataChange = reference.on('value', snapshot => {
             const dataFromDatabase = snapshot.val();
             const newOccupiedSpaces = new Map();
 
-            parkingSpacesData.forEach((_, index) => {
-                newOccupiedSpaces.set(index, dataFromDatabase && dataFromDatabase[index]);
+            parkingSpacesData.forEach((space) => {
+                newOccupiedSpaces.set(space.id, dataFromDatabase && dataFromDatabase[space.id]);
             });
 
             setOccupiedSpaces(newOccupiedSpaces);
         });
 
-        // Unsubscribe from the listener when the component is unmounted
         return () => reference.off('value', onDataChange);
-    }, []);
+    }, [item.name, parkingSpacesData]); // Ad
 
     const carData = [
         { time: '9:00', carCount: 30 },
@@ -37,9 +40,8 @@ const DetailsScreen = ({ navigation, route }) => {
     ];
 
     const totalSpaces = parkingSpacesData.length;
-
-    // Calculate the number of available spaces
     const availableSpaces = Array.from(occupiedSpaces.values()).filter(value => !value).length;
+
 
     return (
         <View style={styles.container}>
@@ -51,9 +53,9 @@ const DetailsScreen = ({ navigation, route }) => {
                 <View style={styles.placeholder} />
             </View>
             <Text style={styles.centerText}>Available Spaces: {availableSpaces}/{totalSpaces}</Text>
-            <ParkingLotMap parkingLotData={item.parkingLotData} />
+            <ParkingLotMap parkingLotData={item.parkingLotData} lotName={item.name} />
             <View style={styles.titleContainer}>
-                <Text style={styles.TitleMap}>Car Park Map</Text>
+                {/* <Text style={styles.TitleMap}>Car Park Map</Text> */}
             </View>
             <View style={styles.centeredContainer}>
                 <TimeChart data={carData} />

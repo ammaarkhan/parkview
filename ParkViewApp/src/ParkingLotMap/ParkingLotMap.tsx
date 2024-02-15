@@ -2,22 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Image, Dimensions, ScrollView } from 'react-native';
 import database from '@react-native-firebase/database'; // Import the Firebase database module
 import carImage from './car.png';
-import parkingSpacesData from './ParkingSpaces.json';
+import parkingVid from './ParkingSpaces.json';
+import parkingLive from './ParkingSpacesLive.json';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const ParkingLotMap = () => {
+const ParkingLotMap = ({ parkingLotData, lotName }) => {
     const [occupiedSpaces, setOccupiedSpaces] = useState(new Map());
+    const parkingSpacesData = lotName === 'Gym Short term' ? parkingLive : parkingVid;
 
     useEffect(() => {
-        const reference = database().ref('/occupied_spaces');
+        // Determine the path based on the parking lot name
+        const dbPath = lotName === 'Gym Short term' ? '/occupied_live' : '/occupied_spaces';
+        const reference = database().ref(dbPath);
 
         const onDataChange = reference.on('value', snapshot => {
             const dataFromDatabase = snapshot.val();
             const newOccupiedSpaces = new Map();
 
             parkingSpacesData.forEach(space => {
-                // Use the 'id' from the parking space data
                 newOccupiedSpaces.set(space.id, dataFromDatabase && dataFromDatabase[space.id]);
             });
 
@@ -25,7 +28,7 @@ const ParkingLotMap = () => {
         });
 
         return () => reference.off('value', onDataChange);
-    }, []);
+    }, [lotName]); // Add lotName as a dependency
 
     const maxWidth = Math.max(...parkingSpacesData.map(s => s.position[0] + s.width));
     const maxHeight = Math.max(...parkingSpacesData.map(s => s.position[1] + s.height));

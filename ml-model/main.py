@@ -57,7 +57,7 @@ def update_database(current_occupied, all_parking_spaces):
     for space_id in all_parking_spaces:
         # Set True if occupied, False otherwise
         is_occupied = space_id in current_occupied
-        db.reference(f'/occupied_spaces/{space_id}').set(is_occupied)
+        db.reference(f'/occupied_live/{space_id}').set(is_occupied) # NEEDS TO CHANGEEEEE
         
 def read_ip_camera(url):
     try:
@@ -77,7 +77,7 @@ def get_user_choice():
     return user_choice
 
 def main():
-    ip_camera_url = 'http://142.231.30.74:8080/shot.jpg'
+    ip_camera_url = 'http://142.231.31.68:8080/shot.jpg'
     parking_spaces = load_parking_spaces()
 
     # Extract all parking space IDs

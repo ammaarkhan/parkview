@@ -10,7 +10,7 @@ from firebase_admin import db, credentials
 import time
 import threading
 
-cred = credentials.Certificate('ml-model/credentials.json')
+cred = credentials.Certificate('credentials.json')
 firebase_admin.initialize_app(cred, {"databaseURL": "https://parkview-3f259-default-rtdb.firebaseio.com/"})
 
 def load_parking_spaces(filename='ParkingSpaces.json'):
@@ -105,7 +105,7 @@ def main():
         if not use_ip_camera or frame is None:  # If IP camera is not available or local source is chosen
             if cap is None:  # Initialize if not already done
                 # cap = cv2.VideoCapture('ml-model/carpark-paper/IMG_7788.mp4')
-                cap = cv2.VideoCapture('ml-model/carpark1/carPark.mp4')
+                cap = cv2.VideoCapture('carpark1/carPark.mp4')
             ret, frame = cap.read()
             if not ret:
                 print("Error reading from local video source.")
